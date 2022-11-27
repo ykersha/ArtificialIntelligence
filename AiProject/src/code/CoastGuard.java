@@ -6,32 +6,36 @@ import java.util.Random;
 
 public class CoastGuard extends SearchProblem {
 
-	int x, y, currentCapacity = 0, maxCapacity, blackBoxesCollected;
-
-	public CoastGuard(int x, int y, int maxCapacity, ArrayList<String> operators, SearchTreeNode initialState) {
+	public CoastGuard(ArrayList<String> operators, SearchTreeNode initialState) {
 		super(operators, initialState);
-		this.x = x;
-		this.y = y;
-		this.maxCapacity = maxCapacity;
-		this.currentCapacity = 0;
-		this.blackBoxesCollected = 0;
 	}
 
-	public int getCurrentCapacity() {
-		return currentCapacity;
-	}
-
-	public void setCurrentCapacity(int currentCapacity) {
-		this.currentCapacity = currentCapacity;
-	}
-
-	public int getMaxCapacity() {
-		return maxCapacity;
-	}
-
-	public void setMaxCapacity(int maxCapacity) {
-		this.maxCapacity = maxCapacity;
-	}
+//	int x, y, currentCapacity = 0, maxCapacity, blackBoxesCollected;
+//
+//	public CoastGuard(int x, int y, int maxCapacity, ArrayList<String> operators, SearchTreeNode initialState) {
+//		super(operators, initialState);
+//		this.x = x;
+//		this.y = y;
+//		this.maxCapacity = maxCapacity;
+//		this.currentCapacity = 0;
+//		this.blackBoxesCollected = 0;
+//	}
+//
+//	public int getCurrentCapacity() {
+//		return currentCapacity;
+//	}
+//
+//	public void setCurrentCapacity(int currentCapacity) {
+//		this.currentCapacity = currentCapacity;
+//	}
+//
+//	public int getMaxCapacity() {
+//		return maxCapacity;
+//	}
+//
+//	public void setMaxCapacity(int maxCapacity) {
+//		this.maxCapacity = maxCapacity;
+//	}
 
 	public static String genGrid() {
 
@@ -143,12 +147,12 @@ public class CoastGuard extends SearchProblem {
 		System.out.printf("+%n");
 	}
 
-	public static CoastGuard getCoastGuard(String grid, ArrayList<String> operators, SearchTreeNode initial) {
+	public static Guard getGuard(String grid) {
 		String[] splitGrid = grid.split(";");
 		int capacity = Integer.parseInt(splitGrid[1]);
 		int cgX = Integer.parseInt(splitGrid[2].split(",")[0]);
 		int cgY = Integer.parseInt(splitGrid[2].split(",")[1]);
-		CoastGuard cg = new CoastGuard(cgX, cgY, capacity, operators, initial);
+		Guard cg = new Guard(cgX, cgY, capacity);
 		return cg;
 	}
 
@@ -209,6 +213,7 @@ public class CoastGuard extends SearchProblem {
 		ArrayList<Station> stations = getStations(grid);
 		ArrayList<Ship> ships = getShips(grid);
 		Cell[][] gridArray = getGridArray(grid, stations, ships);
+		Guard guard = getGuard(grid);
 
 		ArrayList<String> operators = new ArrayList<String>();
 		operators.add("pickup"); // cost 1
@@ -218,9 +223,7 @@ public class CoastGuard extends SearchProblem {
 		operators.add("down"); // cost 2
 		operators.add("left"); // cost 2
 		operators.add("right"); // cost 2
-		SearchTreeNode initialState = new SearchTreeNode(gridArray, ships, stations, null, "", 0, 0);
-
-		CoastGuard cg = getCoastGuard(grid, operators, initialState);
+		SearchTreeNode initialState = new SearchTreeNode(gridArray, guard, ships, stations, null, "", 0, 0);
 
 		QingFn queue;
 		switch (strategy) {
@@ -266,7 +269,7 @@ public class CoastGuard extends SearchProblem {
 		while (!queue.isEmpty()) {
 			SearchTreeNode node = queue.dequeue();
 
-			if (problem.goalTest(this, node.ships)) {
+			if (problem.goalTest(node.guard, node.ships)) {
 				return node;
 			} else {
 
@@ -280,6 +283,7 @@ public class CoastGuard extends SearchProblem {
 	public ArrayList<SearchTreeNode> expand(SearchTreeNode node, ArrayList<String> operators) {
 
 		// coast guard = this
+		Guard guard = node.guard;
 		Cell[][] grid = node.grid;
 		ArrayList<Ship> ships = node.ships;
 		ArrayList<Station> stations = node.stations;
@@ -288,23 +292,23 @@ public class CoastGuard extends SearchProblem {
 		for (String operator : operators) {
 			switch (operator) {
 			case "pickup":
-				if (grid[this.x][this.y] instanceof Ship && this.currentCapacity > 0) {
-					Ship ship = (Ship) grid[this.x][this.y];
+				if (grid[guard.x][guard.y] instanceof Ship && guard.currentCapacity > 0) {
+					Ship ship = (Ship) grid[guard.x][guard.y];
 					if (!ship.isWreck()) {
-						int passengersICanTake = Math.min(ship.getCurrentPassengerCount(), this.currentCapacity);
+						int passengersICanTake = Math.min(ship.getCurrentPassengerCount(), guard.currentCapacity);
 						ship.setCurrentPassengerCount(ship.getCurrentPassengerCount() - passengersICanTake);
-						this.setCurrentCapacity(getCurrentCapacity() - passengersICanTake);
+						guard.setCurrentCapacity(guard.getCurrentCapacity() - passengersICanTake);
 					}
 
 				}
 				break;
-			case "DF":
-//				queue = new DFQueue();
+			case "retrieve":
 				break;
 			}
 		}
 
-		res.add(new SearchTreeNode(grid, ships, stations, node, "right", currentCapacity, blackBoxesCollected));
+		res.add(new SearchTreeNode(grid, guard, ships, stations, node, "right", guard.currentCapacity,
+				guard.blackBoxesCollected));
 
 		return null;
 	}

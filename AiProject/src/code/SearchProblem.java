@@ -13,8 +13,8 @@ public class SearchProblem {
 		this.initialState = initialState;
 	}
 
-	public boolean goalTest(CoastGuard cg, ArrayList<Ship> ships) {
-		if (cg.getCurrentCapacity() > 0) {
+	public boolean goalTest(Guard guard, ArrayList<Ship> ships) {
+		if (guard.getCurrentCapacity() > 0) {
 			return false;
 		}
 
@@ -28,4 +28,3 @@ public class SearchProblem {
 
 }
 
-// state ships[], stations[], coastguard
