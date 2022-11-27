@@ -1,11 +1,11 @@
 package code;
 
-public class Point {
+public class Cell {
 
 	int x;
 	int y;
 	
-	public Point(int x, int y) {
+	public Cell(int x, int y) {
 		super();
 		this.x = x;
 		this.y = y;
@@ -23,7 +23,7 @@ public class Point {
 	public void setY(int y) {
 		this.y = y;
 	}
-	public Point() {
+	public Cell() {
 		// TODO Auto-generated constructor stub
 	}
 
