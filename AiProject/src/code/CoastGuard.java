@@ -282,7 +282,6 @@ public class CoastGuard extends SearchProblem {
 
 	public ArrayList<SearchTreeNode> expand(SearchTreeNode node, ArrayList<String> operators) {
 
-		// coast guard = this
 		Guard guard = node.guard;
 		Cell[][] grid = node.grid;
 		ArrayList<Ship> ships = node.ships;
