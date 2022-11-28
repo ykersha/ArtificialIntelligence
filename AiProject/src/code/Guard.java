@@ -1,10 +1,11 @@
 package code;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Guard extends Cell {
 
-	int currentCapacity = 0, maxCapacity, blackBoxesCollected;
+	int currentCapacity, maxCapacity, blackBoxesCollected;
 
 	public Guard(int x, int y, int maxCapacity) {
 		super(x, y);
@@ -30,22 +31,6 @@ public class Guard extends Cell {
 	}
 
 	public boolean goUp(int width, int height) {
-		if (this.y > 0) {
-			super.setY(super.getY() - 1);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean goDown(int width, int height) {
-		if (this.y < height - 1) {
-			super.setY(super.getY() + 1);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean goLeft(int width, int height) {
 		if (this.x > 0) {
 			super.setX(super.getX() - 1);
 			return true;
@@ -53,9 +38,25 @@ public class Guard extends Cell {
 		return false;
 	}
 
-	public boolean goRight(int width, int height) {
-		if (this.x < width - 1) {
+	public boolean goDown(int width, int height) {
+		if (this.x < height - 1) {
 			super.setX(super.getX() + 1);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean goLeft(int width, int height) {
+		if (this.y > 0) {
+			super.setY(super.getY() - 1);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean goRight(int width, int height) {
+		if (this.y < width - 1) {
+			super.setY(super.getY() + 1);
 			return true;
 		}
 		return false;

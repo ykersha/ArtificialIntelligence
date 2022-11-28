@@ -224,8 +224,9 @@ public class CoastGuard extends SearchProblem {
 		operators.add("left"); // cost 2
 		operators.add("right"); // cost 2
 		SearchTreeNode initialState = new SearchTreeNode(gridArray, guard, ships, stations, null, "", 0, 0);
+		SearchProblem problem = new SearchProblem(operators, initialState);
 
-		QingFn queue;
+		QingFn queue = null;
 		switch (strategy) {
 		case "BF":
 			queue = new BFQueue();
@@ -259,6 +260,7 @@ public class CoastGuard extends SearchProblem {
 //				+ " " + shipCoordinatesAndPassengersArray.get(1).getX() + " " 
 //				+ shipCoordinatesAndPassengersArray.get(1).getY() + " " + shipCoordinatesAndPassengersArray.get(1).getPassengerCount());
 //		
+		generalSearch(problem, queue);
 		return "";
 	}
 
@@ -300,7 +302,7 @@ public class CoastGuard extends SearchProblem {
 		return cellCopy;
 	}
 
-	public SearchTreeNode generalSearch(SearchProblem problem, QingFn queue) {
+	public static SearchTreeNode generalSearch(SearchProblem problem, QingFn queue) {
 
 		queue.enqueue(problem.initialState);
 
@@ -313,6 +315,9 @@ public class CoastGuard extends SearchProblem {
 				ArrayList<SearchTreeNode> expandedNodes = expand(node, problem.operators);
 				for (SearchTreeNode expandedNode : expandedNodes) {
 					queue.enqueue(expandedNode);
+					System.out.println(expandedNode.ships.get(0).getCurrentPassengerCount() + " "
+							+ expandedNode.ships.get(0).getBlackBoxCounter() + " " + expandedNode.guard.x + " "
+							+ expandedNode.guard.y + " " + expandedNode.guard.getCurrentCapacity());
 				}
 
 			}
@@ -322,7 +327,7 @@ public class CoastGuard extends SearchProblem {
 		return null;
 	}
 
-	public ArrayList<SearchTreeNode> expand(SearchTreeNode node, ArrayList<String> operators) {
+	public static ArrayList<SearchTreeNode> expand(SearchTreeNode node, ArrayList<String> operators) {
 
 		// coast guard = this
 		Guard guard = node.guard;
@@ -341,15 +346,16 @@ public class CoastGuard extends SearchProblem {
 			Cell[][] gridCopy = getGridCopy(grid, shipsCopy, stationsCopy);
 			switch (operator) {
 			case "pickup":
-				if (grid[guard.x][guard.y] instanceof Ship && guard.currentCapacity > 0) {
+				if (grid[guard.x][guard.y] instanceof Ship && guard.currentCapacity < guard.maxCapacity) {
 					Ship shipCopy = (Ship) gridCopy[guard.x][guard.y];
 					if (!shipCopy.isWreck()) {
 						guardCopy = (Guard) PipedDeepCopy.copy(guard);
 						int passengersICanTake = Math.min(shipCopy.getCurrentPassengerCount(),
-								guardCopy.currentCapacity);
+								guardCopy.maxCapacity - guardCopy.currentCapacity);
 						shipCopy.setCurrentPassengerCount(shipCopy.getCurrentPassengerCount() - passengersICanTake);
-						guardCopy.setCurrentCapacity(guardCopy.getCurrentCapacity() - passengersICanTake);
+						guardCopy.setCurrentCapacity(guardCopy.getCurrentCapacity() + passengersICanTake);
 						actionDone = true;
+						System.out.println("my current capacity guys hiii" + " " + guardCopy.getCurrentCapacity());
 					}
 
 				}
@@ -362,6 +368,7 @@ public class CoastGuard extends SearchProblem {
 						shipCopy.setBlackBoxExpired(true);
 						guardCopy.blackBoxesCollected++;
 						actionDone = true;
+						System.out.println("I AM INSIDE Retrieve  box");
 					}
 				}
 				break;
@@ -369,8 +376,10 @@ public class CoastGuard extends SearchProblem {
 				if (grid[guard.x][guard.y] instanceof Station) { // Do we check if the guard has passengers?
 					Station stationCopy = (Station) gridCopy[guard.x][guard.y];
 					guardCopy = (Guard) PipedDeepCopy.copy(guard);
+					System.out.println(guardCopy.getCurrentCapacity() + " The passenger i will drop now");
 					if (guardCopy.getCurrentCapacity() > 0) {
 						stationCopy.setPassengersSaved(guardCopy.getCurrentCapacity());
+						System.out.println("I AM DROPPING SOME PASSENGERS RN" + " " + stationCopy.getPassengersSaved());
 						guardCopy.setCurrentCapacity(0);
 						actionDone = true;
 					}
@@ -411,16 +420,18 @@ public class CoastGuard extends SearchProblem {
 
 	public static void main(String[] args) {
 
-		Cell cell = new Cell(1, 1);
-		Ship ship = new Ship(cell.x, cell.y, 32);
-		Ship copy = (Ship) PipedDeepCopy.copy(ship);
-		Guard guard = new Guard(cell.x, cell.y, 1);
-//		guard.goUp();
-//		ship.setCurrentPassengerCount(1);
-////		System.out.println(ship.getCurrentPassengerCount());
-////		System.out.println(copy.getCurrentPassengerCount());
-//		guard.goUp();
-		System.out.println(guard.getY());
+//		Cell cell = new Cell(1, 1);
+//		Ship ship = new Ship(cell.x, cell.y, 32);
+//		Ship copy = (Ship) PipedDeepCopy.copy(ship);
+//		Guard guard = new Guard(cell.x, cell.y, 1);
+////		guard.goUp();
+////		ship.setCurrentPassengerCount(1);
+//////		System.out.println(ship.getCurrentPassengerCount());
+//////		System.out.println(copy.getCurrentPassengerCount());
+////		guard.goUp();
+//		System.out.println(guard.getY());
+		System.out.println("AUGIA");
+		CoastGuard.Solve("2,2;97;0,1;0,0,1,0;1,1,5", "BF", false);
 	}
 
 }
