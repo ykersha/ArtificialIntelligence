@@ -1,6 +1,8 @@
 package code;
 
-public class Ship extends Cell{
+import java.io.Serializable;
+
+public class Ship extends Cell implements Serializable{
 
 
 	private int currentPassengerCount;

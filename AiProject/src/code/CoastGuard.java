@@ -262,6 +262,44 @@ public class CoastGuard extends SearchProblem {
 		return "";
 	}
 
+//	private static int getShipIndex(ArrayList<Ship> ships, int x, int y) {
+//		int i = 0;
+//		for (Ship ship : ships) {
+//			if (ship.getX() == x && ship.getY() == y) {
+//				return i;
+//			}
+//			i++;
+//		}
+//		return -1;
+//	}
+//
+//	private static int getStationIndex(ArrayList<Station> stations, int x, int y) {
+//		int i = 0;
+//		for (Station station : stations) {
+//			if (station.getX() == x && station.getY() == y) {
+//				return i;
+//			}
+//			i++;
+//		}
+//		return -1;
+//	}
+
+	private static Cell[][] getGridCopy(Cell[][] oldGrid, ArrayList<Ship> ships, ArrayList<Station> stations) {
+		Cell[][] cellCopy = new Cell[oldGrid.length][oldGrid[0].length];
+		for (Ship ship : ships) {
+			int x = ship.getX();
+			int y = ship.getY();
+			cellCopy[x][y] = ship;
+		}
+
+		for (Station station : stations) {
+			int x = station.getX();
+			int y = station.getY();
+			cellCopy[x][y] = station;
+		}
+		return cellCopy;
+	}
+
 	public SearchTreeNode generalSearch(SearchProblem problem, QingFn queue) {
 
 		queue.enqueue(problem.initialState);
@@ -272,6 +310,10 @@ public class CoastGuard extends SearchProblem {
 			if (problem.goalTest(node.guard, node.ships)) {
 				return node;
 			} else {
+				ArrayList<SearchTreeNode> expandedNodes = expand(node, problem.operators);
+				for (SearchTreeNode expandedNode : expandedNodes) {
+					queue.enqueue(expandedNode);
+				}
 
 			}
 
@@ -290,27 +332,95 @@ public class CoastGuard extends SearchProblem {
 		ArrayList<SearchTreeNode> res = new ArrayList<SearchTreeNode>();
 
 		for (String operator : operators) {
+			boolean actionDone = false;
+			Guard guardCopy = (Guard) PipedDeepCopy.copy(guard);
+			@SuppressWarnings("unchecked")
+			ArrayList<Ship> shipsCopy = (ArrayList<Ship>) PipedDeepCopy.copy(ships);
+			@SuppressWarnings("unchecked")
+			ArrayList<Station> stationsCopy = (ArrayList<Station>) PipedDeepCopy.copy(stations);
+			Cell[][] gridCopy = getGridCopy(grid, shipsCopy, stationsCopy);
 			switch (operator) {
 			case "pickup":
 				if (grid[guard.x][guard.y] instanceof Ship && guard.currentCapacity > 0) {
-					Ship ship = (Ship) grid[guard.x][guard.y];
-					if (!ship.isWreck()) {
-						int passengersICanTake = Math.min(ship.getCurrentPassengerCount(), guard.currentCapacity);
-						ship.setCurrentPassengerCount(ship.getCurrentPassengerCount() - passengersICanTake);
-						guard.setCurrentCapacity(guard.getCurrentCapacity() - passengersICanTake);
+					Ship shipCopy = (Ship) gridCopy[guard.x][guard.y];
+					if (!shipCopy.isWreck()) {
+						guardCopy = (Guard) PipedDeepCopy.copy(guard);
+						int passengersICanTake = Math.min(shipCopy.getCurrentPassengerCount(),
+								guardCopy.currentCapacity);
+						shipCopy.setCurrentPassengerCount(shipCopy.getCurrentPassengerCount() - passengersICanTake);
+						guardCopy.setCurrentCapacity(guardCopy.getCurrentCapacity() - passengersICanTake);
+						actionDone = true;
 					}
 
 				}
 				break;
 			case "retrieve":
+				if (grid[guard.x][guard.y] instanceof Ship) {
+					Ship shipCopy = (Ship) gridCopy[guard.x][guard.y];
+					if (shipCopy.isWreck() && !shipCopy.isBlackBoxExpired()) {
+						guardCopy = (Guard) PipedDeepCopy.copy(guard);
+						shipCopy.setBlackBoxExpired(true);
+						guardCopy.blackBoxesCollected++;
+						actionDone = true;
+					}
+				}
 				break;
+			case "drop":
+				if (grid[guard.x][guard.y] instanceof Station) { // Do we check if the guard has passengers?
+					Station stationCopy = (Station) gridCopy[guard.x][guard.y];
+					guardCopy = (Guard) PipedDeepCopy.copy(guard);
+					if (guardCopy.getCurrentCapacity() > 0) {
+						stationCopy.setPassengersSaved(guardCopy.getCurrentCapacity());
+						guardCopy.setCurrentCapacity(0);
+						actionDone = true;
+					}
+				}
+				break;
+			case "up":
+				actionDone = guardCopy.goUp(grid[0].length, grid.length);
+				break;
+			case "down":
+				actionDone = guardCopy.goDown(grid[0].length, grid.length);
+				break;
+			case "left":
+				actionDone = guardCopy.goLeft(grid[0].length, grid.length);
+				break;
+			case "right":
+				actionDone = guardCopy.goRight(grid[0].length, grid.length);
+				break;
+			}
+
+			if (actionDone) {
+				for (Ship ship : shipsCopy) {
+//				int shipPassengerCount = ship.getCurrentPassengerCount();
+//				if(shipPassengerCount >0) {
+//					ship.setCurrentPassengerCount(shipPassengerCount - 1);
+//				}
+//				else if(ship.isWreck() && !ship.isBlackBoxExpired()) {
+//					ship.setBlackBoxCounter(ship.getBlackBoxCounter() - 1);
+//				}
+					ship.timestep();
+				}
+				res.add(new SearchTreeNode(gridCopy, guardCopy, shipsCopy, stationsCopy, node, operator, node.depth + 1,
+						1));
 			}
 		}
 
-		res.add(new SearchTreeNode(grid, guard, ships, stations, node, "right", guard.currentCapacity,
-				guard.blackBoxesCollected));
+		return res;
+	}
 
-		return null;
+	public static void main(String[] args) {
+
+		Cell cell = new Cell(1, 1);
+		Ship ship = new Ship(cell.x, cell.y, 32);
+		Ship copy = (Ship) PipedDeepCopy.copy(ship);
+		Guard guard = new Guard(cell.x, cell.y, 1);
+//		guard.goUp();
+//		ship.setCurrentPassengerCount(1);
+////		System.out.println(ship.getCurrentPassengerCount());
+////		System.out.println(copy.getCurrentPassengerCount());
+//		guard.goUp();
+		System.out.println(guard.getY());
 	}
 
 }
