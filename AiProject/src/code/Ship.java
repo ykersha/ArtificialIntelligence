@@ -1,5 +1,7 @@
 package code;
 
+import java.io.Serializable;
+
 public class Ship extends Cell{
 
 

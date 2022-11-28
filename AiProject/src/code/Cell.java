@@ -1,6 +1,8 @@
 package code;
 
-public class Cell {
+import java.io.Serializable;
+
+public class Cell implements Serializable{
 
 	int x;
 	int y;

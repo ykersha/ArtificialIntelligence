@@ -23,6 +23,7 @@ public class SearchProblem {
 				return false;
 			}
 		}
+		System.out.println(guard.x + " " + guard.y);
 		return true;
 	}
 
