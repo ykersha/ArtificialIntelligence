@@ -62,4 +62,14 @@ public class Guard extends Cell {
 		return false;
 	}
 
+	public Guard copy() {
+		Guard newG = new Guard(x, y, maxCapacity);
+		newG.currentCapacity = currentCapacity;
+		newG.blackBoxesCollected = blackBoxesCollected;
+		return newG;
+	}
+
+	public String toString() {
+		return x + "," + y + "," + currentCapacity + "," + blackBoxesCollected;
+	}
 }

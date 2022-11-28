@@ -2,8 +2,7 @@ package code;
 
 import java.io.Serializable;
 
-public class Ship extends Cell{
-
+public class Ship extends Cell {
 
 	private int currentPassengerCount;
 	private int initialPassengerCount;
@@ -16,7 +15,7 @@ public class Ship extends Cell{
 		this.currentPassengerCount = passengerCount;
 		this.initialPassengerCount = passengerCount;
 		isWreck = false;
-		blackBoxCounter = 1;
+		blackBoxCounter = 0;
 		blackBoxExpired = false;
 	}
 
@@ -74,4 +73,18 @@ public class Ship extends Cell{
 		return initialPassengerCount;
 	}
 
+	public Ship copy() {
+		Ship newShip = new Ship(x, y, currentPassengerCount);
+		newShip.blackBoxCounter = blackBoxCounter;
+		newShip.blackBoxExpired = blackBoxExpired;
+		newShip.currentPassengerCount = currentPassengerCount;
+		newShip.initialPassengerCount = initialPassengerCount;
+		newShip.isWreck = isWreck;
+		return newShip;
+	}
+
+	public String toString() {
+		return currentPassengerCount + "," + isWreck + "," + blackBoxCounter + ","
+				+ blackBoxExpired+",";
+	}
 }
