@@ -1,37 +1,39 @@
 package code;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Stack;
 
-public class BFQueue extends QingFn {
+public class IDQueue extends QingFn {
 
-	Queue<SearchTreeNode> queue;
+	int depth;
+	Stack<SearchTreeNode> st;
 
-	public BFQueue() {
+	public IDQueue(int depth) {
 		// TODO Auto-generated constructor stub
-		queue = new LinkedList<SearchTreeNode>();
+		st = new Stack<SearchTreeNode>();
+		this.depth = depth;
 	}
 
 	@Override
 	public SearchTreeNode dequeue() {
 		// TODO Auto-generated method stub
-		return queue.poll();
+		return st.pop();
 	}
 
 	@Override
 	public void enqueue(SearchTreeNode node) {
 		// TODO Auto-generated method stub
 		String nodeEnc = node.toString();
-		if (!expandedNodes.contains(nodeEnc)) {
-			queue.add(node);
+		if (node.depth <= depth && !expandedNodes.contains(nodeEnc)) {
+			st.push(node);
 			expandedNodes.add(nodeEnc);
 		}
+
 	}
 
 	@Override
 	public boolean isEmpty() {
 		// TODO Auto-generated method stub
-		return queue.isEmpty();
+		return st.isEmpty();
 	}
 
 }

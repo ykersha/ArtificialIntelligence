@@ -70,6 +70,6 @@ public class Guard extends Cell {
 	}
 
 	public String toString() {
-		return x + "," + y + "," + currentCapacity + "," + blackBoxesCollected;
+		return x + "," + y + "," + currentCapacity + "," + blackBoxesCollected + ",";
 	}
 }

@@ -18,7 +18,11 @@ public class DFQueue extends QingFn{
 	@Override
 	public void enqueue(SearchTreeNode node) {
 		// TODO Auto-generated method stub
-		st.add(node);
+		String nodeEnc = node.toString();
+		if (!expandedNodes.contains(nodeEnc)) {
+			st.push(node);
+			expandedNodes.add(nodeEnc);
+		}
 		
 	}
 

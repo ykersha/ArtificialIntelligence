@@ -84,7 +84,6 @@ public class Ship extends Cell {
 	}
 
 	public String toString() {
-		return currentPassengerCount + "," + isWreck + "," + blackBoxCounter + ","
-				+ blackBoxExpired+",";
+		return currentPassengerCount + "," + blackBoxCounter + ",";
 	}
 }

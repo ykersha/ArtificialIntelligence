@@ -28,19 +28,21 @@ public class SearchTreeNode {
 	}
 
 	public String toString() {
-		String s = guard.toString() + ";";
+		StringBuilder sb = new StringBuilder(guard.toString() + ";");
 
 		for (Ship ship : ships) {
-			s += ship.toString();
+			sb.append(ship.toString());
 		}
-		s += ";";
-		for (Station station : stations) {
-			s += station.toString();
-		}
+		sb.append(";");
+//		for (Station station : stations) {
+//			sb.append(station.toString());
+//		}
 		
+		sb.append(depth);
+		sb.append(";");
 //		s += ";" + operator + ";";
 //		s += ";" + operator + ";" + depth + ";";
-		return s+";";
+		return sb.toString();
 	}
 
 }

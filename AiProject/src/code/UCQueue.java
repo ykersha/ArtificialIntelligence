@@ -1,20 +1,20 @@
 package code;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.PriorityQueue;
 
-public class BFQueue extends QingFn {
+public class UCQueue extends QingFn {
 
-	Queue<SearchTreeNode> queue;
+	PriorityQueue<SearchTreeNode> queue;
 
-	public BFQueue() {
+	public UCQueue() {
 		// TODO Auto-generated constructor stub
-		queue = new LinkedList<SearchTreeNode>();
+		queue = new PriorityQueue<SearchTreeNode>((SearchTreeNode a, SearchTreeNode b) -> a.pathCost - b.pathCost);
 	}
 
 	@Override
 	public SearchTreeNode dequeue() {
 		// TODO Auto-generated method stub
+//		System.out.println(queue.peek().pathCost);
 		return queue.poll();
 	}
 
