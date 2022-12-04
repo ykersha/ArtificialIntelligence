@@ -72,4 +72,15 @@ public class Guard extends Cell {
 	public String toString() {
 		return x + "," + y + "," + currentCapacity + "," + blackBoxesCollected + ",";
 	}
+	
+	public void appendStringBuilder(StringBuilder sb) {
+		sb.append(x);
+		sb.append(',');
+		sb.append(y);
+		sb.append(',');
+		sb.append(currentCapacity);
+		sb.append(',');
+		sb.append(blackBoxesCollected);
+		sb.append(',');
+	}
 }

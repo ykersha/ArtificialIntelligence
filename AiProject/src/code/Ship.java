@@ -86,4 +86,11 @@ public class Ship extends Cell {
 	public String toString() {
 		return currentPassengerCount + "," + blackBoxCounter + ",";
 	}
+
+	public void appendStringBuilder(StringBuilder sb) {
+		sb.append(currentPassengerCount);
+		sb.append(",");
+		sb.append(blackBoxCounter);
+		sb.append(",");
+	}
 }

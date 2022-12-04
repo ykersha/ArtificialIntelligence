@@ -260,7 +260,7 @@ public class CoastGuard extends SearchProblem {
 
 			if (problem.goalTest(node.guard, node.ships)) {
 
-				System.out.print(node.depth+" ");
+				System.out.print(node.depth + " ");
 
 				String s = getPlan(node) + ";" + getDeaths(node) + ";" + node.guard.blackBoxesCollected + ";"
 						+ numExpanded;
@@ -277,9 +277,7 @@ public class CoastGuard extends SearchProblem {
 //								+ expandedNode.ships.get(0).getBlackBoxCounter() + " Gcap:"
 //								+ expandedNode.guard.getCurrentCapacity());
 				}
-
 			}
-
 		}
 		return numExpanded + "";
 	}
@@ -323,6 +321,7 @@ public class CoastGuard extends SearchProblem {
 			for (Station station : stations) {
 				stationsCopy.add(station.copy());
 			}
+
 			Cell[][] gridCopy = getGridCopy(grid, shipsCopy, stationsCopy);
 
 			switch (operator) {
@@ -423,6 +422,22 @@ public class CoastGuard extends SearchProblem {
 		return total - retrieved;
 	}
 
+	private static boolean isShipAt(int x, int y, ArrayList<Ship> ships) {
+		for (Ship ship : ships) {
+			if (ship.getX() == x && ship.getY() == y)
+				return true;
+		}
+		return false;
+	}
+
+	private static boolean isStationAt(int x, int y, ArrayList<Station> stations) {
+		for (Station station : stations) {
+			if (station.getX() == x && station.getY() == y)
+				return true;
+		}
+		return false;
+	}
+
 	public static void main(String[] args) {
 
 		String grid0 = "5,6;50;0,1;0,4,3,3;1,1,90;";
@@ -437,7 +452,7 @@ public class CoastGuard extends SearchProblem {
 		String grid9 = "7,5;100;3,4;2,6,3,5;0,0,4,0,1,8,1,4,77,1,5,1,3,2,94,4,3,46;";
 		String grid10 = "10,6;59;1,7;0,0,2,2,3,0,5,3;1,3,69,3,4,80,4,7,94,4,9,14,5,2,39;";
 
-		visualize(grid4);
+		visualize(grid3);
 		CoastGuard.solve(grid4, "ID", false);
 		CoastGuard.solve(grid4, "BF", false);
 

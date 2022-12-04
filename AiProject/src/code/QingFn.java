@@ -14,4 +14,8 @@ public abstract class QingFn {
 	public abstract void enqueue(SearchTreeNode node);
 	
 	public abstract boolean isEmpty();
+	
+	public boolean isNodeExpanded(SearchTreeNode node) {
+		return expandedNodes.contains(node.toString());
+	}
 }
