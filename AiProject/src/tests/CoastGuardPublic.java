@@ -607,12 +607,12 @@ public class CoastGuardPublic {
 
 			if (!ss.containsKey(x00 + "," + x01)) {
 				mn();
-				System.out.println("heyppp");
+//				System.out.println("heyppp");
 				return false;
 			}
 			if (ss.get(x00 + "," + x01) < 0 && ss.get(x00 + "," + x01) > -20) {
 				
-				System.out.println( "weird ass thing " + ss.get(x00 + "," + x01));
+//				System.out.println( "weird ass thing " + ss.get(x00 + "," + x01));
 				r += 1;
 				ss.replace(x00 + "," + x01, (byte) 0);
 				mn();

@@ -7,7 +7,6 @@ public class Ship extends Cell {
 	private boolean isWreck;
 	private int blackBoxCounter;
 	private boolean blackBoxExpired;
-	
 	private boolean blackBoxRetrived;
 
 
@@ -60,7 +59,7 @@ public class Ship extends Cell {
 	public boolean timestep() { //returns true iff a person dies on this ship in this timestep
 		if (isWreck) {
 			// blackbox logic
-			if (!blackBoxExpired) {
+			if (!blackBoxExpired && !blackBoxRetrived) {
 				setBlackBoxCounter(blackBoxCounter + 1);
 			}
 			return false;

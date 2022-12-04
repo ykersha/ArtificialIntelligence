@@ -3,6 +3,7 @@ package code;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Stack;
 
 public class CoastGuard extends SearchProblem {
 
@@ -64,62 +65,6 @@ public class CoastGuard extends SearchProblem {
 		return encoding;
 	}
 
-	public static void visualize(String encoding) {
-
-		String[] split = encoding.split(";");
-
-		String[] dims = split[0].split(",");
-		int m = Integer.parseInt(dims[0]);
-		int n = Integer.parseInt(dims[1]);
-
-		String[][] grid = new String[n][m];
-
-		int capacity = Integer.parseInt(split[1]);
-
-		String[] cgPos = split[2].split(",");
-		int cgX = Integer.parseInt(cgPos[0]);
-		int cgY = Integer.parseInt(cgPos[1]);
-
-		grid[cgX][cgY] = "CGuard(" + capacity + ")";
-
-		String[] stations = split[3].split(",");
-		for (int i = 0; i < stations.length; i += 2) {
-			int x = Integer.parseInt(stations[i]);
-			int y = Integer.parseInt(stations[i + 1]);
-			grid[x][y] = "Station";
-		}
-
-		String[] ships = split[4].split(",");
-		for (int i = 0; i < ships.length; i += 3) {
-			int x = Integer.parseInt(ships[i]);
-			int y = Integer.parseInt(ships[i + 1]);
-			int c = Integer.parseInt(ships[i + 2]);
-			grid[x][y] = "Ship(" + c + ")";
-		}
-
-		for (int i = 0; i < n; i++) {
-
-			for (int j = 0; j < m; j++) {
-				System.out.printf("%-11s", "+-----------");
-			}
-
-			System.out.printf("+%n");
-
-			for (int j = 0; j < m; j++) {
-				if (grid[i][j] != null) {
-					System.out.printf("|%-11s", grid[i][j]);
-				} else {
-					System.out.printf("|%-11s", "");
-				}
-			}
-			System.out.printf("|%n");
-		}
-		for (int j = 0; j < m; j++) {
-			System.out.printf("%-11s", "+-----------");
-		}
-		System.out.printf("+%n");
-	}
-
 	public static void visualize(Cell[][] gridArray, Guard guard, ArrayList<Ship> ships, ArrayList<Station> stations) {
 
 		int n = gridArray.length;
@@ -128,31 +73,54 @@ public class CoastGuard extends SearchProblem {
 		for (int i = 0; i < n; i++) {
 
 			for (int j = 0; j < m; j++) {
-				System.out.printf("%-11s", "+-----------");
+				System.out.printf("%-18s", "+------------------");
 			}
 			System.out.printf("+%n");
 
 			for (int j = 0; j < m; j++) {
 				if (gridArray[i][j] instanceof Ship && !(i == guard.getX() && j == guard.getY())) {
 					Ship ship = (Ship) gridArray[i][j];
-					System.out.printf("|%-11s", "Ship(" + ship.getCurrentPassengerCount() + ")");
+					if (ship.isWreck()) {
+						if (ship.isBlackBoxRetrived()) {
+							System.out.printf("|%-18s", "BB Retrieved");
+						} else if (ship.isBlackBoxExpired()) {
+							System.out.printf("|%-18s", "BB Expired");
+						} else {
+							System.out.printf("|%-18s", "Wreck(" + (20 - ship.getBlackBoxCounter()) + ")");
+						}
+					} else {
+						System.out.printf("|%-18s", "Ship(" + ship.getCurrentPassengerCount() + ")");
+					}
+
 				} else if (gridArray[i][j] instanceof Station && !(i == guard.getX() && j == guard.getY())) {
-					System.out.printf("|%-11s", "Station");
+					System.out.printf("|%-18s", "Station");
+
 				} else if (gridArray[i][j] instanceof Ship && i == guard.getX() && j == guard.getY()) {
 					Ship ship = (Ship) gridArray[i][j];
-					System.out.printf("|%-11s", "Ship(" + ship.getCurrentPassengerCount() + ")*");
+					if (ship.isWreck()) {
+						if (ship.isBlackBoxRetrived()) {
+							System.out.printf("|%-18s", "BB Retrieved*");
+						} else if (ship.isBlackBoxExpired()) {
+							System.out.printf("|%-18s", "BB Expired*");
+						} else {
+							System.out.printf("|%-18s", "Wreck(" + (20 - ship.getBlackBoxCounter()) + ")*");
+						}
+					} else {
+						System.out.printf("|%-18s", "Ship(" + ship.getCurrentPassengerCount() + ")*");
+					}
 				} else if (gridArray[i][j] instanceof Station && (i == guard.getX() && j == guard.getY())) {
-					System.out.printf("|%-11s", "Station*");
+					System.out.printf("|%-18s", "Station*");
 				} else if (i == guard.getX() && j == guard.getY()) {
-					System.out.printf("|%-11s", "CGuard(" + guard.getCurrentCapacity() + ")");
+					System.out.printf("|%-18s",
+							"CGuard(" + guard.getCurrentCapacity() + ")" + "(" + guard.blackBoxesCollected + ")*");
 				} else {
-					System.out.printf("|%-11s", "");
+					System.out.printf("|%-18s", "");
 				}
 			}
 			System.out.printf("|%n");
 		}
 		for (int j = 0; j < m; j++) {
-			System.out.printf("%-11s", "+-----------");
+			System.out.printf("%-18s", "+------------------");
 		}
 		System.out.printf("+%n");
 	}
@@ -243,7 +211,7 @@ public class CoastGuard extends SearchProblem {
 			queue = new DFQueue();
 			break;
 		case "ID":
-			String res = IDSearch(problem);
+			String res = IDSearch(problem, visualize);
 			System.out.println(strategy + " " + res);
 			return res;
 		case "UC":
@@ -266,7 +234,7 @@ public class CoastGuard extends SearchProblem {
 			break;
 		}
 
-		String res = generalSearch(problem, queue);
+		String res = generalSearch(problem, queue, visualize);
 		System.out.println(strategy + " " + res);
 
 		return res;
@@ -288,7 +256,7 @@ public class CoastGuard extends SearchProblem {
 		return cellCopy;
 	}
 
-	public static String generalSearch(SearchProblem problem, QingFn queue) {
+	public static String generalSearch(SearchProblem problem, QingFn queue, boolean visualize) {
 
 		int numExpanded = 0;
 		queue.enqueue(problem.initialState);
@@ -298,9 +266,9 @@ public class CoastGuard extends SearchProblem {
 
 			if (problem.goalTest(node.guard, node.ships)) {
 
-				System.out.print(node.depth + " ");
+				System.out.println("depth: " + node.depth + " ");
 
-				String s = getPlan(node) + ";" + getDeaths(node) + ";" + node.guard.blackBoxesCollected + ";"
+				String s = getPlan(node, visualize) + ";" + getDeaths(node) + ";" + node.guard.blackBoxesCollected + ";"
 						+ numExpanded;
 				return s;
 			} else {
@@ -320,13 +288,13 @@ public class CoastGuard extends SearchProblem {
 		return numExpanded + "";
 	}
 
-	public static String IDSearch(SearchProblem problem) {
+	public static String IDSearch(SearchProblem problem, boolean visualize) {
 
 		int numExpanded = 0;
 		int depth = 0;
 		while (true) {
 			QingFn queue = new IDQueue(depth);
-			String dlsResult = generalSearch(problem, queue);
+			String dlsResult = generalSearch(problem, queue, visualize);
 			if (!dlsResult.contains(";")) {
 				numExpanded += Integer.parseInt(dlsResult);
 				depth++;
@@ -380,8 +348,8 @@ public class CoastGuard extends SearchProblem {
 				if (grid[guard.x][guard.y] instanceof Ship) {
 					Ship shipCopy = (Ship) gridCopy[guard.x][guard.y];
 					if (shipCopy.isWreck() && !shipCopy.isBlackBoxExpired() && !shipCopy.isBlackBoxRetrived()) {
-						shipCopy.setBlackBoxExpired(true);
-						shipCopy.setBlackBoxCounter(0);
+//						shipCopy.setBlackBoxCounter(0);
+//						shipCopy.setBlackBoxExpired(false);
 						shipCopy.setBlackBoxRetrived(true);
 						guardCopy.blackBoxesCollected++;
 						actionDone = true;
@@ -438,16 +406,28 @@ public class CoastGuard extends SearchProblem {
 		return res;
 	}
 
-	public static String getPlan(SearchTreeNode node) {
+	public static String getPlan(SearchTreeNode node, boolean visualize) {
 		String s = "";
+
+		Stack<SearchTreeNode> st = new Stack<SearchTreeNode>();
 
 		while (node != null) {
 			s = "," + node.operator + s;
-			visualize(node.grid, node.guard, node.ships, node.stations);
-			System.out.println();
-			System.out.println();
-
+			st.push(node);
 			node = node.parent;
+		}
+
+		if (visualize) {
+			while (!st.isEmpty()) {
+				SearchTreeNode cu = st.pop();
+
+				if (cu.operator.length() > 0)
+					System.out.println("Action: " + cu.operator);
+
+				visualize(cu.grid, cu.guard, cu.ships, cu.stations);
+				System.out.println();
+				System.out.println();
+			}
 		}
 
 		return s.substring(2);
@@ -495,15 +475,16 @@ public class CoastGuard extends SearchProblem {
 		String grid2 = "7,5;40;2,3;3,6;1,1,10,4,5,90;";
 		String grid3 = "8,5;60;4,6;2,7;3,4,37,3,5,93,4,0,40;";
 		String grid4 = "5,7;63;4,2;6,2,6,3;0,0,17,0,2,73,3,0,30;";
+
 		String grid5 = "5,5;69;3,3;0,0,0,1,1,0;0,3,78,1,2,2,1,3,14,4,4,9;";
+
 		String grid6 = "7,5;86;0,0;1,3,1,5,4,2;1,1,42,2,5,99,3,5,89;";
 		String grid7 = "6,7;82;1,4;2,3;1,1,58,3,0,58,4,2,72;";
 		String grid8 = "6,6;74;1,1;0,3,1,0,2,0,2,4,4,0,4,2,5,0;0,0,78,3,3,5,4,3,40;";
 		String grid9 = "7,5;100;3,4;2,6,3,5;0,0,4,0,1,8,1,4,77,1,5,1,3,2,94,4,3,46;";
 		String grid10 = "10,6;59;1,7;0,0,2,2,3,0,5,3;1,3,69,3,4,80,4,7,94,4,9,14,5,2,39;";
 
-		visualize(grid5);
-		CoastGuard.solve(grid5, "UC", false);
+		CoastGuard.solve(grid2, "UC", true);
 //		CoastGuard.solve(grid4, "BF", false);
 
 	}
