@@ -1,8 +1,5 @@
 package code;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 public class Guard extends Cell {
 
 	int currentCapacity, maxCapacity, blackBoxesCollected;

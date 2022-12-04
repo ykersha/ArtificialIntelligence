@@ -26,6 +26,8 @@ public class SearchTreeNode {
 		this.depth = depth;
 		this.pathCost = pathCost;
 	}
+	
+	
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

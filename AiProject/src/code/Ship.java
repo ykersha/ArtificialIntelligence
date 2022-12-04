@@ -1,7 +1,5 @@
 package code;
 
-import java.io.Serializable;
-
 public class Ship extends Cell {
 
 	private int currentPassengerCount;
@@ -9,6 +7,9 @@ public class Ship extends Cell {
 	private boolean isWreck;
 	private int blackBoxCounter;
 	private boolean blackBoxExpired;
+	
+	private boolean blackBoxRetrived;
+
 
 	public Ship(int x, int y, int passengerCount) {
 		super(x, y);
@@ -17,6 +18,7 @@ public class Ship extends Cell {
 		isWreck = false;
 		blackBoxCounter = 0;
 		blackBoxExpired = false;
+		blackBoxRetrived = false;
 	}
 
 	public int getCurrentPassengerCount() {
@@ -27,7 +29,6 @@ public class Ship extends Cell {
 		this.currentPassengerCount = passengerCount;
 		if (this.currentPassengerCount == 0) {
 			isWreck = true;
-
 		} else {
 			isWreck = false;
 		}
@@ -56,21 +57,31 @@ public class Ship extends Cell {
 		}
 	}
 
-	public void timestep() {
+	public boolean timestep() { //returns true iff a person dies on this ship in this timestep
 		if (isWreck) {
 			// blackbox logic
 			if (!blackBoxExpired) {
 				setBlackBoxCounter(blackBoxCounter + 1);
 			}
+			return false;
 		} else {
 			// decrement passengers
 			setCurrentPassengerCount(currentPassengerCount - 1);
+			return true;
 		}
 
 	}
 
 	public int getInitialPassengerCount() {
 		return initialPassengerCount;
+	}
+	
+	public boolean isBlackBoxRetrived() {
+		return blackBoxRetrived;
+	}
+
+	public void setBlackBoxRetrived(boolean blackBoxRetrived) {
+		this.blackBoxRetrived = blackBoxRetrived;
 	}
 
 	public Ship copy() {
@@ -80,6 +91,7 @@ public class Ship extends Cell {
 		newShip.currentPassengerCount = currentPassengerCount;
 		newShip.initialPassengerCount = initialPassengerCount;
 		newShip.isWreck = isWreck;
+		newShip.blackBoxRetrived = blackBoxRetrived;
 		return newShip;
 	}
 

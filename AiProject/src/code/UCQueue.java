@@ -9,6 +9,13 @@ public class UCQueue extends QingFn {
 	public UCQueue() {
 		// TODO Auto-generated constructor stub
 		queue = new PriorityQueue<SearchTreeNode>((SearchTreeNode a, SearchTreeNode b) -> a.pathCost - b.pathCost);
+		
+		/*
+		 * if( a.pathCost.deaths ==  b.pathCost.deaths)
+		 * 		return a.pathCost.expired - b.pathCost.expired
+		 * else
+		 * 		return a.pathCost.deaths -  b.pathCost.deaths
+		 * */
 	}
 
 	@Override
