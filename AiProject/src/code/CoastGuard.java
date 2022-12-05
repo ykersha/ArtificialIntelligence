@@ -73,7 +73,7 @@ public class CoastGuard extends SearchProblem {
 		for (int i = 0; i < n; i++) {
 
 			for (int j = 0; j < m; j++) {
-				System.out.printf("%-18s", "+------------------");
+				System.out.printf("%-16s", "+----------------");
 			}
 			System.out.printf("+%n");
 
@@ -82,45 +82,45 @@ public class CoastGuard extends SearchProblem {
 					Ship ship = (Ship) gridArray[i][j];
 					if (ship.isWreck()) {
 						if (ship.isBlackBoxRetrived()) {
-							System.out.printf("|%-18s", "BB Retrieved");
+							System.out.printf("|%-16s", "BB Retrieved");
 						} else if (ship.isBlackBoxExpired()) {
-							System.out.printf("|%-18s", "BB Expired");
+							System.out.printf("|%-16s", "BB Expired");
 						} else {
-							System.out.printf("|%-18s", "Wreck(" + (20 - ship.getBlackBoxCounter()) + ")");
+							System.out.printf("|%-16s", "Wreck(" + (20 - ship.getBlackBoxCounter()) + ")");
 						}
 					} else {
-						System.out.printf("|%-18s", "Ship(" + ship.getCurrentPassengerCount() + ")");
+						System.out.printf("|%-16s", "Ship(" + ship.getCurrentPassengerCount() + ")");
 					}
 
 				} else if (gridArray[i][j] instanceof Station && !(i == guard.getX() && j == guard.getY())) {
-					System.out.printf("|%-18s", "Station");
+					System.out.printf("|%-16s", "Station");
 
 				} else if (gridArray[i][j] instanceof Ship && i == guard.getX() && j == guard.getY()) {
 					Ship ship = (Ship) gridArray[i][j];
 					if (ship.isWreck()) {
 						if (ship.isBlackBoxRetrived()) {
-							System.out.printf("|%-18s", "BB Retrieved*");
+							System.out.printf("|%-16s", "BB Retrieved*");
 						} else if (ship.isBlackBoxExpired()) {
-							System.out.printf("|%-18s", "BB Expired*");
+							System.out.printf("|%-16s", "BB Expired*");
 						} else {
-							System.out.printf("|%-18s", "Wreck(" + (20 - ship.getBlackBoxCounter()) + ")*");
+							System.out.printf("|%-16s", "Wreck(" + (20 - ship.getBlackBoxCounter()) + ")*");
 						}
 					} else {
-						System.out.printf("|%-18s", "Ship(" + ship.getCurrentPassengerCount() + ")*");
+						System.out.printf("|%-16s", "Ship(" + ship.getCurrentPassengerCount() + ")*");
 					}
 				} else if (gridArray[i][j] instanceof Station && (i == guard.getX() && j == guard.getY())) {
-					System.out.printf("|%-18s", "Station*");
+					System.out.printf("|%-16s", "Station*");
 				} else if (i == guard.getX() && j == guard.getY()) {
-					System.out.printf("|%-18s",
+					System.out.printf("|%-16s",
 							"CGuard(" + guard.getCurrentCapacity() + ")" + "(" + guard.blackBoxesCollected + ")*");
 				} else {
-					System.out.printf("|%-18s", "");
+					System.out.printf("|%-16s", "");
 				}
 			}
 			System.out.printf("|%n");
 		}
 		for (int j = 0; j < m; j++) {
-			System.out.printf("%-18s", "+------------------");
+			System.out.printf("%-16s", "+----------------");
 		}
 		System.out.printf("+%n");
 	}
@@ -199,7 +199,8 @@ public class CoastGuard extends SearchProblem {
 		operators.add("down"); // cost 2
 		operators.add("right"); // cost 2
 		operators.add("left");
-		SearchTreeNode initialState = new SearchTreeNode(gridArray, guard, ships, stations, null, "", 0, 0);
+		SearchTreeNode initialState = new SearchTreeNode(gridArray, guard, ships, stations, null, "", 0,
+				new int[] { 0, 0 });
 		SearchProblem problem = new SearchProblem(operators, initialState);
 
 		QingFn queue = null;
@@ -218,16 +219,16 @@ public class CoastGuard extends SearchProblem {
 			queue = new UCQueue();
 			break;
 		case "GR1":
-			System.out.println("GR1");
+			queue = new GR1Queue();
 			break;
 		case "GR2":
 			System.out.println("GR2");
 			break;
 		case "AS1":
-			System.out.println("AS1");
+			queue = new AS1Queue();
 			break;
 		case "AS2":
-			System.out.println("AS2");
+			queue = new AS2Queue();
 			break;
 		default:
 			System.out.println("Invalid Input");
@@ -267,6 +268,7 @@ public class CoastGuard extends SearchProblem {
 			if (problem.goalTest(node.guard, node.ships)) {
 
 				System.out.println("depth: " + node.depth + " ");
+				System.out.println("Coast Guard Capacity: " + node.guard.maxCapacity + " ");
 
 				String s = getPlan(node, visualize) + ";" + getDeaths(node) + ";" + node.guard.blackBoxesCollected + ";"
 						+ numExpanded;
@@ -339,6 +341,10 @@ public class CoastGuard extends SearchProblem {
 								guardCopy.maxCapacity - guardCopy.currentCapacity);
 						shipCopy.setCurrentPassengerCount(shipCopy.getCurrentPassengerCount() - passengersICanTake);
 						guardCopy.setCurrentCapacity(guardCopy.getCurrentCapacity() + passengersICanTake);
+
+						if (shipCopy.getCurrentPassengerCount() == 0) // bbCount starts 0 and timestep makes it 1
+							shipCopy.setBlackBoxCounter(0);
+
 						actionDone = true;
 					}
 
@@ -348,7 +354,7 @@ public class CoastGuard extends SearchProblem {
 				if (grid[guard.x][guard.y] instanceof Ship) {
 					Ship shipCopy = (Ship) gridCopy[guard.x][guard.y];
 					if (shipCopy.isWreck() && !shipCopy.isBlackBoxExpired() && !shipCopy.isBlackBoxRetrived()) {
-//						shipCopy.setBlackBoxCounter(0);
+						shipCopy.setBlackBoxCounter(0);
 //						shipCopy.setBlackBoxExpired(false);
 						shipCopy.setBlackBoxRetrived(true);
 						guardCopy.blackBoxesCollected++;
@@ -397,9 +403,11 @@ public class CoastGuard extends SearchProblem {
 					if (!bbBefore && bbAfter)
 						bbExpired++;
 				}
+				
+				int[] pathCostCopy = {node.pathCost[0] + deaths, node.pathCost[1] + bbExpired};
 
 				res.add(new SearchTreeNode(gridCopy, guardCopy, shipsCopy, stationsCopy, node, operator, node.depth + 1,
-						node.pathCost + 2 * deaths + bbExpired));
+						pathCostCopy));
 			}
 		}
 
@@ -421,8 +429,13 @@ public class CoastGuard extends SearchProblem {
 			while (!st.isEmpty()) {
 				SearchTreeNode cu = st.pop();
 
-				if (cu.operator.length() > 0)
-					System.out.println("Action: " + cu.operator);
+				if (cu.operator.length() > 0) {
+					String num = cu.operator.equals("pickup")
+							? (cu.guard.currentCapacity - cu.parent.guard.currentCapacity) + ""
+							: cu.operator.equals("drop") ? cu.parent.guard.currentCapacity + "" : "";
+
+					System.out.println("Action: " + cu.operator + " " + num);
+				}
 
 				visualize(cu.grid, cu.guard, cu.ships, cu.stations);
 				System.out.println();
@@ -475,17 +488,16 @@ public class CoastGuard extends SearchProblem {
 		String grid2 = "7,5;40;2,3;3,6;1,1,10,4,5,90;";
 		String grid3 = "8,5;60;4,6;2,7;3,4,37,3,5,93,4,0,40;";
 		String grid4 = "5,7;63;4,2;6,2,6,3;0,0,17,0,2,73,3,0,30;";
-
 		String grid5 = "5,5;69;3,3;0,0,0,1,1,0;0,3,78,1,2,2,1,3,14,4,4,9;";
-
 		String grid6 = "7,5;86;0,0;1,3,1,5,4,2;1,1,42,2,5,99,3,5,89;";
 		String grid7 = "6,7;82;1,4;2,3;1,1,58,3,0,58,4,2,72;";
 		String grid8 = "6,6;74;1,1;0,3,1,0,2,0,2,4,4,0,4,2,5,0;0,0,78,3,3,5,4,3,40;";
 		String grid9 = "7,5;100;3,4;2,6,3,5;0,0,4,0,1,8,1,4,77,1,5,1,3,2,94,4,3,46;";
 		String grid10 = "10,6;59;1,7;0,0,2,2,3,0,5,3;1,3,69,3,4,80,4,7,94,4,9,14,5,2,39;";
 
-		CoastGuard.solve(grid2, "UC", true);
-//		CoastGuard.solve(grid4, "BF", false);
+//		CoastGuard.solve(grid4, "AS1", false);
+		System.out.println();
+		CoastGuard.solve(grid10, "GR1", true);
 
 	}
 

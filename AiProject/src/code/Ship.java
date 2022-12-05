@@ -15,7 +15,7 @@ public class Ship extends Cell {
 		this.currentPassengerCount = passengerCount;
 		this.initialPassengerCount = passengerCount;
 		isWreck = false;
-		blackBoxCounter = 0;
+		blackBoxCounter = 1;
 		blackBoxExpired = false;
 		blackBoxRetrived = false;
 	}

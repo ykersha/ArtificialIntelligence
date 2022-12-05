@@ -2,18 +2,17 @@ package code;
 
 import java.util.PriorityQueue;
 
-public class UCQueue extends QingFn {
+public class AS2Queue extends QingFn {
 
 	PriorityQueue<SearchTreeNode> queue;
 
-	public UCQueue() {
-		// TODO Auto-generated constructor stub
-		
-		//deaths = pathCost[0], blackBoxesExpired = pathCost[1]
-		queue = new PriorityQueue<SearchTreeNode>(
-				(SearchTreeNode a, SearchTreeNode b) -> a.pathCost[0] == b.pathCost[0] ? a.pathCost[1] - b.pathCost[1]
-						: a.pathCost[0] - b.pathCost[0]);
-
+	public AS2Queue() {
+		// deaths = pathCost[0], blackBoxesExpired = pathCost[1]
+		// sort based on heuristic and if h is equal sort with lower expired first
+		queue = new PriorityQueue<SearchTreeNode>((SearchTreeNode a,
+				SearchTreeNode b) -> a.pathCost[0] + a.AsHeuristic1() == b.pathCost[0] + b.AsHeuristic1()
+						? (a.pathCost[1] + a.AsHeuristic2()) - (b.pathCost[1] + b.AsHeuristic2())
+						: (a.pathCost[0] + a.AsHeuristic1()) - (b.pathCost[0] + b.AsHeuristic1()));
 	}
 
 	@Override
