@@ -19,12 +19,12 @@ public class SearchProblem {
 		}
 
 		for (Ship ship : ships) {
-			if (ship.getCurrentPassengerCount() > 0 || !ship.isBlackBoxExpired()) {
+			if (ship.getCurrentPassengerCount() > 0 || (!ship.isBlackBoxExpired() && !ship.isBlackBoxRetrived())) {
 				return false;
 			}
 		}
+//		System.out.println(guard.x + " " + guard.y);
 		return true;
 	}
 
 }
-

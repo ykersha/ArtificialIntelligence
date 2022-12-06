@@ -1,15 +1,18 @@
 package code;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.PriorityQueue;
 
-public class BFQueue extends QingFn {
+//treated as A* for now
+public class GR1Queue extends QingFn {
 
-	Queue<SearchTreeNode> queue;
+	PriorityQueue<SearchTreeNode> queue;
 
-	public BFQueue() {
-		// TODO Auto-generated constructor stub
-		queue = new LinkedList<SearchTreeNode>();
+	public GR1Queue() {
+		queue = new PriorityQueue<SearchTreeNode>((SearchTreeNode a,
+				SearchTreeNode b) -> (a.deathHeuristic1() == b.deathHeuristic1()
+						? (a.expiredHeuristic() - b.expiredHeuristic())
+						: a.deathHeuristic1() - b.deathHeuristic1()));
+
 	}
 
 	@Override

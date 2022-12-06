@@ -1,20 +1,25 @@
 package code;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.PriorityQueue;
 
-public class BFQueue extends QingFn {
+public class UCQueue extends QingFn {
 
-	Queue<SearchTreeNode> queue;
+	PriorityQueue<SearchTreeNode> queue;
 
-	public BFQueue() {
+	public UCQueue() {
 		// TODO Auto-generated constructor stub
-		queue = new LinkedList<SearchTreeNode>();
+		
+		//deaths = pathCost[0], blackBoxesExpired = pathCost[1]
+		queue = new PriorityQueue<SearchTreeNode>(
+				(SearchTreeNode a, SearchTreeNode b) -> a.pathCost[0] == b.pathCost[0] ? a.pathCost[1] - b.pathCost[1]
+						: a.pathCost[0] - b.pathCost[0]);
+
 	}
 
 	@Override
 	public SearchTreeNode dequeue() {
 		// TODO Auto-generated method stub
+//		System.out.println(queue.peek().pathCost);
 		return queue.poll();
 	}
 
