@@ -222,7 +222,7 @@ public class CoastGuard extends SearchProblem {
 			queue = new GR1Queue();
 			break;
 		case "GR2":
-			System.out.println("GR2");
+			queue = new GR2Queue();
 			break;
 		case "AS1":
 			queue = new AS1Queue();
@@ -493,11 +493,18 @@ public class CoastGuard extends SearchProblem {
 		String grid7 = "6,7;82;1,4;2,3;1,1,58,3,0,58,4,2,72;";
 		String grid8 = "6,6;74;1,1;0,3,1,0,2,0,2,4,4,0,4,2,5,0;0,0,78,3,3,5,4,3,40;";
 		String grid9 = "7,5;100;3,4;2,6,3,5;0,0,4,0,1,8,1,4,77,1,5,1,3,2,94,4,3,46;";
+		
 		String grid10 = "10,6;59;1,7;0,0,2,2,3,0,5,3;1,3,69,3,4,80,4,7,94,4,9,14,5,2,39;";
 
 //		CoastGuard.solve(grid4, "AS1", false);
 		System.out.println();
-		CoastGuard.solve(grid10, "GR1", true);
+		
+
+//		CoastGuard.solve(grid10, "UC", false);
+//		CoastGuard.solve(grid10, "GR1", false);
+//		CoastGuard.solve(grid10, "GR2", false);
+//		CoastGuard.solve(grid10, "AS1", false);
+		CoastGuard.solve(grid9, "AS1", false);
 
 	}
 

@@ -28,17 +28,20 @@ public class SearchTreeNode {
 		this.pathCost = pathCost;
 	}
 
-	public int AsHeuristic1() {
+	public int deathHeuristic1() {
 		int deaths = 0;
 		for (Ship ship : ships) {
 			int distance = Math.abs(ship.x - guard.x) + Math.abs(ship.y - guard.y);
 			deaths += Math.min(distance, ship.getCurrentPassengerCount());
 		}
 
+		if(pathCost[0] + deaths > 40)
+			System.out.println("g(n)=" + pathCost[0] + "    h(n)=" + deaths + "     total = " + (pathCost[0] + deaths));
+
 		return deaths;
 	}
 
-	public int AsHeuristic2() {
+	public int expiredHeuristic() {
 		int expired = 0;
 
 		for (Ship ship : ships) {
@@ -53,12 +56,16 @@ public class SearchTreeNode {
 		return expired;
 	}
 
-	public int GrHeuristic1() {
+	public int deathHeuristic2() {
 		int deaths = 0;
 		int[] passengersLeft = new int[ships.size()];
 
+		boolean guardOnAShip = false;
 		for (int i = 0; i < ships.size(); i++) {
 			passengersLeft[i] = ships.get(i).getCurrentPassengerCount();
+			if (guard.x == ships.get(i).x && guard.y == ships.get(i).y) {
+				guardOnAShip = true;
+			}
 		}
 		Arrays.sort(passengersLeft);
 
@@ -70,35 +77,45 @@ public class SearchTreeNode {
 		}
 
 		while (i < passengersLeft.length) {
-
 //			System.out.print("[");
 //			for (int x : passengersLeft)
 //				System.out.print(x + " ");
 //			System.out.println("]");
 
-			if (passengersLeft[i] > 0) {
-				// teleport to ship
-				//	deaths += updateAndReturnNonZeroShips(passengersLeft);
+			// teleport to ship and pickup passengers if possible
+			if (passengersLeft[i] > 0 && remCapacity > 0) {
+
+				// teleport
+				if (!guardOnAShip)
+					deaths += updateAndReturnNonZeroShips(passengersLeft);
 
 				int passengersICanTake = Math.min(passengersLeft[i], remCapacity);
 				passengersLeft[i] -= passengersICanTake;
 				remCapacity -= passengersICanTake;
 
-				// pickup passengers
+				// pickup
 				deaths += updateAndReturnNonZeroShips(passengersLeft);
 			}
 
+			if (passengersLeft[i] == 0)
+				i++;
+
 			if (remCapacity == 0) {
 				// teleport to station
-				deaths += updateAndReturnNonZeroShips(passengersLeft);
+				if (!(grid[guard.x][guard.y] instanceof Station))
+					deaths += updateAndReturnNonZeroShips(passengersLeft);
+				
 				// drop to station
 				deaths += updateAndReturnNonZeroShips(passengersLeft);
 				remCapacity = guard.getMaxCapacity();
 			}
 
-			if (passengersLeft[i] == 0)
-				i++;
 		}
+
+		if(pathCost[0] + deaths > 40) {
+			System.out.println("g(n)=" + pathCost[0] + "    h(n)=" + deaths + "     total = " + (pathCost[0] + deaths) + "     " + pathCost[1]);
+		}
+		
 		return deaths;
 	}
 

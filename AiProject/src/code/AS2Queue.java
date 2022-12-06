@@ -10,9 +10,11 @@ public class AS2Queue extends QingFn {
 		// deaths = pathCost[0], blackBoxesExpired = pathCost[1]
 		// sort based on heuristic and if h is equal sort with lower expired first
 		queue = new PriorityQueue<SearchTreeNode>((SearchTreeNode a,
-				SearchTreeNode b) -> a.pathCost[0] + a.AsHeuristic1() == b.pathCost[0] + b.AsHeuristic1()
-						? (a.pathCost[1] + a.AsHeuristic2()) - (b.pathCost[1] + b.AsHeuristic2())
-						: (a.pathCost[0] + a.AsHeuristic1()) - (b.pathCost[0] + b.AsHeuristic1()));
+				SearchTreeNode b) -> a.pathCost[0] + a.deathHeuristic2() == b.pathCost[0] + b.deathHeuristic2()
+						? (a.pathCost[1] + a.expiredHeuristic()) - (b.pathCost[1] + b.expiredHeuristic())
+						: (a.pathCost[0] + a.deathHeuristic2()) - (b.pathCost[0] + b.deathHeuristic2()));
+		
+		
 	}
 
 	@Override

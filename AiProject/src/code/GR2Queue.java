@@ -3,17 +3,15 @@ package code;
 import java.util.PriorityQueue;
 
 //treated as A* for now
-public class GR1Queue extends QingFn {
+public class GR2Queue extends QingFn {
 
 	PriorityQueue<SearchTreeNode> queue;
 
-	public GR1Queue() {
-		
+	public GR2Queue() {
 		queue = new PriorityQueue<SearchTreeNode>((SearchTreeNode a,
-				SearchTreeNode b) -> (a.deathHeuristic1() == b.deathHeuristic1()
+				SearchTreeNode b) -> (a.deathHeuristic2() == b.deathHeuristic2()
 						? (a.expiredHeuristic() - b.expiredHeuristic())
-						: a.deathHeuristic1() - b.deathHeuristic1()));
-
+						: a.deathHeuristic2() - b.deathHeuristic2()));
 	}
 
 	@Override

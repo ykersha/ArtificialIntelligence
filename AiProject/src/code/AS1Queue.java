@@ -13,9 +13,9 @@ public class AS1Queue extends QingFn {
 		
 		//sort based on heuristic and if h is equal sort with lower expired first
 		queue = new PriorityQueue<SearchTreeNode>((SearchTreeNode a,
-				SearchTreeNode b) -> a.pathCost[0] + a.AsHeuristic1() == b.pathCost[0] + b.AsHeuristic1()
-						? a.pathCost[1] - b.pathCost[1]
-						: (a.pathCost[0] + a.AsHeuristic1()) - (b.pathCost[0] + b.AsHeuristic1()));
+				SearchTreeNode b) -> a.pathCost[0] + a.deathHeuristic1() == b.pathCost[0] + b.deathHeuristic1()
+						? (a.pathCost[1] + a.expiredHeuristic()) - (b.pathCost[1] + b.expiredHeuristic())
+						: (a.pathCost[0] + a.deathHeuristic1()) - (b.pathCost[0] + b.deathHeuristic1()));
 	}
 
 	@Override
