@@ -17,7 +17,6 @@ public class GR2Queue extends QingFn {
 	@Override
 	public SearchTreeNode dequeue() {
 		// TODO Auto-generated method stub
-//		System.out.println(queue.peek().pathCost);
 		return queue.poll();
 	}
 

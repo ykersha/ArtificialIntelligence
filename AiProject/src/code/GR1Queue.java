@@ -8,7 +8,6 @@ public class GR1Queue extends QingFn {
 	PriorityQueue<SearchTreeNode> queue;
 
 	public GR1Queue() {
-		
 		queue = new PriorityQueue<SearchTreeNode>((SearchTreeNode a,
 				SearchTreeNode b) -> (a.deathHeuristic1() == b.deathHeuristic1()
 						? (a.expiredHeuristic() - b.expiredHeuristic())
@@ -19,7 +18,6 @@ public class GR1Queue extends QingFn {
 	@Override
 	public SearchTreeNode dequeue() {
 		// TODO Auto-generated method stub
-//		System.out.println(queue.peek().pathCost);
 		return queue.poll();
 	}
 

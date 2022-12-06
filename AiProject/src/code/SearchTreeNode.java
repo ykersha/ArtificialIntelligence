@@ -28,19 +28,6 @@ public class SearchTreeNode {
 		this.pathCost = pathCost;
 	}
 
-	public int deathHeuristic1() {
-		int deaths = 0;
-		for (Ship ship : ships) {
-			int distance = Math.abs(ship.x - guard.x) + Math.abs(ship.y - guard.y);
-			deaths += Math.min(distance, ship.getCurrentPassengerCount());
-		}
-
-		if(pathCost[0] + deaths > 40)
-			System.out.println("g(n)=" + pathCost[0] + "    h(n)=" + deaths + "     total = " + (pathCost[0] + deaths));
-
-		return deaths;
-	}
-
 	public int expiredHeuristic() {
 		int expired = 0;
 
@@ -54,6 +41,16 @@ public class SearchTreeNode {
 		}
 
 		return expired;
+	}
+	
+	public int deathHeuristic1() {
+		int deaths = 0;
+		for (Ship ship : ships) {
+			int distance = Math.abs(ship.x - guard.x) + Math.abs(ship.y - guard.y);
+			deaths += Math.min(distance, ship.getCurrentPassengerCount());
+		}
+
+		return deaths;
 	}
 
 	public int deathHeuristic2() {
@@ -109,13 +106,7 @@ public class SearchTreeNode {
 				deaths += updateAndReturnNonZeroShips(passengersLeft);
 				remCapacity = guard.getMaxCapacity();
 			}
-
 		}
-
-		if(pathCost[0] + deaths > 40) {
-			System.out.println("g(n)=" + pathCost[0] + "    h(n)=" + deaths + "     total = " + (pathCost[0] + deaths) + "     " + pathCost[1]);
-		}
-		
 		return deaths;
 	}
 
@@ -142,7 +133,6 @@ public class SearchTreeNode {
 		int bbRet = 0;
 		for (Ship ship : ships) {
 //			ship.appendStringBuilder(sb);
-
 			rem += ship.getCurrentPassengerCount();
 			bb += ship.getBlackBoxCounter();
 
